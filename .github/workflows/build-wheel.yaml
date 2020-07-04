@@ -21,6 +21,7 @@ jobs:
       - name: Get file name and sha256 of asset
         id: asset
         run: |
+          echo "::set-output name=package_name::$(awk -F '==' '{ print $1 }' requirements.txt)"
           echo "::set-output name=filename::$(ls *.whl)"
           echo "::set-output name=sha256::$(shasum -a 256 *.whl | awk '{ print $1 }')"
       - name: Show sha256 of asset
@@ -43,4 +44,4 @@ jobs:
           token: ${{ secrets.DISPATCH_TOKEN }}
           repository: alpine-wheels/index
           event-type: add_file
-          client-payload: '{"package_name": "bcrypt", "href": "${{ steps.upload.outputs.browser_download_url }}", "hash_name": "sha256", "hash_value": "${{ steps.asset.outputs.sha256 }}"}'
+          client-payload: '{"package_name": "${{ steps.asset.outputs.package_name }}", "href": "${{ steps.upload.outputs.browser_download_url }}", "hash_name": "sha256", "hash_value": "${{ steps.asset.outputs.sha256 }}"}'
